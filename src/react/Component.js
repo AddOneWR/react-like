@@ -1,5 +1,4 @@
 import { enqueueSetState } from './StateQueue'
-import { renderComponent } from '../react-dom/Diff'
 
 class Component {
   constructor(props){
