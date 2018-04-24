@@ -45,19 +45,7 @@ export function render(nextElement, container){
 
   if(nextElement.attrs){
     Object.keys(nextElement.attrs).map(key => {
-      const value = nextElement.attrs[key];
-
-      //转换className
-      if(key === 'className'){
-        key = 'class'
-      }
-
-      //转换监听函数
-      if(typeof value === 'function'){
-        dom[key.toLowerCase()] = value;
-      }else{
-        setAttribute(key, nextElement.attrs[key], dom)
-      }
+      setAttribute(key, nextElement.attrs[key], dom)
     })
   }
 

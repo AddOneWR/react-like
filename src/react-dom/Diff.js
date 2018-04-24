@@ -34,8 +34,6 @@ export function setComponentProps(component, props, container){
 export function renderComponent(component, container){
   let base;
 
-  // console.log(component)
-
   if ( component.base && component.componentWillUpdate ) {
     component.componentWillUpdate();
   }
@@ -58,54 +56,3 @@ export function renderComponent(component, container){
     render(base, component.parentNode)
   }
 }
-
-
-// export function diff(nextElement, dom, container){
-//  const result = diffNode(nextElement, dom)
-// }
-
-// function diffNode(nextElement, dom){
-
-//   let node = dom;
-
-//   if(nextElement == undefined || nextElement == null || typeof nextElement === 'boolean'){
-//     nextElement = ''
-//   }
-
-//   if(typeof nextElement === 'number'){
-//     nextElement = String(nextElement)
-//   }
-
-//   if(typeof nextElement === 'string'){
-//     if(dom && dom.nodeType === 3){
-//       if(dom.textContent !== nextElement){
-//         dom.textContent = nextElement
-//       }
-//     }else{
-//       node = document.createTextNode(nextElement)
-//       if (dom && dom.parentNode) {
-//         dom.parentNode.replaceChild(node, dom)
-//       }
-//     }
-    
-//     return node;
-//   }
-
-//   if(!dom || !isSameNode(nextElement, dom)){
-
-//   }
-// }
-
-// function isSameNode(nextElement, dom){
-//   if(typeof nextElement === 'string' || typeof nextElement === 'number'){
-//     return dom.nodeType === 3;
-//   }
-
-//   if(typeof nextElement.tag === 'string'){
-//     return dom.nodeName.toLowerCase() === nextElement.tag.toLowerCase();
-//   }
-
-//   return dom && dom._component && dom._component.constructor === nextElement.tag;
-// }
-
-

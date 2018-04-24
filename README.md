@@ -283,6 +283,149 @@ return container.appendChild(dom)
 
 最后判断两次`render`的组件是否为同一个，若为同一个则调用`replaceChild`方法进行替换，否则`appendChild`到容器中
 
-> 未完待续
+回到上面`nextElement.tag === 'function'`中，其中有两个函数`createComponent`和`setComponentProps`
 
+```Javascript
+// src/react-dom/Diff.js
 
+export function createComponent(component, props){
+  let instance;
+  if(component.prototype && component.prototype.render){
+    instance = new component(props)
+  }else{
+    instance = new component(props)
+    instance.constructor = component
+    instance.render = function() {
+      return this.constructor(props)
+    }
+  }
+
+  return instance;
+}
+```
+
+第一个`if`判断是不是`class`创建的组件，若是则直接`new`一个，若不是则为函数返回组件，调整一下`constructor`以及`render`方法，然后将新组件返回
+
+```Javascript
+// src/react-dom/Diff.js
+
+export function setComponentProps(component, props, container){
+  if (!component.base){
+    if (component.componentWillMount) 
+      component.componentWillMount();
+	}else if(component.componentWillReceiveProps){
+		component.componentWillReceiveProps(props);
+  }
+  
+  component.props = props;
+  component.parentNode = container
+
+  renderComponent(component, container)
+}
+```
+
+首先判断组件的`base`是否存在，若存在则判断是否为初次挂载，否则判断是否为接受新的`props`，然后将`props`即`render`中的`attrs`和`container`作为成员添加到`component`上，`parentNode`用来定位父元素方便更新，然后调用`renderComponent`进行组件挂载或者更新
+
+```Javascript
+// src/react-dom/Diff.js
+
+export function renderComponent(component, container){
+  let base;
+
+  if ( component.base && component.componentWillUpdate ) {
+    component.componentWillUpdate();
+  }
+
+  base = component.render()
+
+  if (component.base) {
+    if (component.componentDidUpdate){
+      component.componentDidUpdate();
+    }
+  }else if(component.componentDidMount) {
+    component.componentDidMount();
+  }
+
+  component.base = base;
+  base._component = component;
+
+  if(!container){
+    component.isReplace = true
+    render(base, component.parentNode)
+  }
+}
+```
+
+`base`为`createComponent`中的`component`渲染后结果，然后进行一下简单的生命周期判断，最后判断`container`是否为空，若为空则为更新组件，把`component.parentNode`作为`container`传回`render`
+
+### State更新
+
+在文章开始提到过，`Component`中的`setState`方法调用了`enqueueSetState`
+
+```Javascript
+// src/react/StateQueue.js
+
+const batchingUpdates = [] // 需要更新的状态
+const dirtyComponent = [] // 需要更新的组件
+var isbatchingUpdates = false // 是否处于更新状态
+
+function callbackQueue(fn){
+  return Promise.resolve().then(fn);
+}
+
+export function enqueueSetState(partialState, component){
+  if(!isbatchingUpdates){
+    callbackQueue(flushBatchedUpdates)
+  }
+
+  isbatchingUpdates = true
+
+  batchingUpdates.push({
+    partialState,
+    component
+  })
+
+  if(!dirtyComponent.some(item => item === component)){
+    dirtyComponent.push(component)
+  }
+}
+```
+
+`isbatchingUpdates`判断事务是否处于更新状态(初始值为`false`)，若不为更新则调用`callbackQueue`来执行`flushBatchedUpdates`函数来更新组件，然后设置更新状态为`true`，将当前状态和组件添加到`batchingUpdates`中，最后判断`dirtyComponent`中是否有当前组件，若无则添加进去
+
+> `callbackQueue`使用了`Promise`来达到延时模拟`setState`的功能
+
+```Javascript
+// src/react/StateQueue.js
+
+function flushBatchedUpdates(){
+  let queueItem, componentItem;
+  while(queueItem = batchingUpdates.shift()){
+    const { partialState, component } = queueItem;
+
+    if(!component.prevState){
+      component.prevState = Object.assign({}, partialState)
+    }
+
+    if(typeof partialState == 'function'){
+      Object.assign(component.state, partialState(component.prevState, component.props))
+    }else{
+      Object.assign(component.state, partialState)
+    }
+
+    component.prevState = component.state
+  }
+
+  while(componentItem = dirtyComponent.shift()){
+    renderComponent(componentItem)
+  }
+
+  isbatchingUpdates = false
+}
+```
+
+遍历`batchingUpdates`数组排头(`shift`自查)，获取其中组件和状态，判断组件的前一个状态，若无之前的状态，则将空对象和当前状态合并设为该组件的初始状态，若💰一状态为`function`，则调用该函数并将返回值和之前状态合并，若不为函数则直接合并，然后设置组件的上一状态为其之前的状态，最后遍历`dirtyComponent`更新组件，完成后设置`isbatchingUpdates`为`false`
+
+至此，基本功能完成
+
+代码请移步[GitHub仓库](https://github.com/AddOneDn/react-like)
