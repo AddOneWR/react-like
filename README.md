@@ -78,7 +78,7 @@ function createElement(tag, attrs, children){
 export default createElement;
 ```
 
-这里同样进行一些初始化操作，但是对传进来的`children`进行了特殊的处理，利用`arguments`获得`children`长度，之后决定是转化成数组还是直接写到`porps`上去，最后将所有属性作为对象返回，当用户创建`React`对象时会自动调用这个函数
+这里同样进行一些初始化操作，但是对传进来的`children`进行了特殊的处理，利用`arguments`获得`children`长度，之后决定是转化成数组还是直接写到`porps`上去，最后将所有属性作为对象返回，当用户创建`React`对象时会自动调用这个函数
 
 ### 渲染
 
@@ -98,7 +98,7 @@ const ReactDOM = {
 export default ReactDOM;
 ```
 
-在这里定义了一个大名鼎鼎的`render`函数，传入两个参数分别为当前的元素和要插入的容器，然后调用`Render`文件中的`render`方法
+在这里定义了一个大名鼎鼎的`render`函数，传入两个参数分别为当前的元素和要插入的容器，然后调用`Render`文件中的`render`方法
 
 ```Javascript
 // src/react-dom/Render.js
@@ -183,7 +183,7 @@ function isSameDom(item, dom){
 
 export default render;
 ```
-
+
 代码比较长，我们这里分段分析一下
 
 ```Javascript
@@ -281,7 +281,7 @@ if(nextElement._component){
 return container.appendChild(dom)
 ```
 
-最后判断两次`render`的组件是否为同一个，若为同一个则调用`replaceChild`方法进行替换，否则`appendChild`到容器中
+最后判断两次`render`的组件是否为同一个，若为同一个则调用`replaceChild`方法进行替换，否则`appendChild`到容器中
 
 回到上面`nextElement.tag === 'function'`中，其中有两个函数`createComponent`和`setComponentProps`
 
@@ -391,7 +391,7 @@ export function enqueueSetState(partialState, component){
 }
 ```
 
-`isbatchingUpdates`判断事务是否处于更新状态(初始值为`false`)，若不为更新则调用`callbackQueue`来执行`flushBatchedUpdates`函数来更新组件，然后设置更新状态为`true`，将当前状态和组件添加到`batchingUpdates`中，最后判断`dirtyComponent`中是否有当前组件，若无则添加进去
+`isbatchingUpdates`判断事务是否处于更新状态(初始值为`false`)，若不为更新则调用`callbackQueue`来执行`flushBatchedUpdates`函数来更新组件，然后设置更新状态为`true`，将当前状态和组件添加到`batchingUpdates`中，最后判断`dirtyComponent`中是否有当前组件，若无则添加进去
 
 > `callbackQueue`使用了`Promise`来达到延时模拟`setState`的功能
 
