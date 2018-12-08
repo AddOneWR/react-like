@@ -40,21 +40,20 @@ ReactDOM.render(
   <Counter />,
   document.getElementById('root')
 )
-// setInterval(() => {
-//   const Element = (
-//     <h1
-//     id="2"
-//     onClick={() => console.log(1)}
-//     >
-//       Hello, Now Time is : 
-//       <span style="color: red">{ new Date().toLocaleTimeString()}</span>
-//     </h1>
-//   )
-//   ReactDOM.render(
-//     <App />,
-//     document.getElementById('root')
-//   )
-// },10000)
+
+const Element = (
+    <h1
+    id="2"
+    onClick={() => console.log(1)}
+    >
+      Hello, Now Time is : 
+      <span style="color: red">{ new Date().toLocaleTimeString()}</span>
+    </h1>
+  )
+  ReactDOM.render(
+    <Element />,
+    document.getElementById('func')
+  )
 
 
 

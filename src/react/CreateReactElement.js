@@ -1,5 +1,11 @@
+/**
+ * @msg: 创建元素
+ * @param {any} tag 创建所需tag
+ * @param {any} attrs 元素属性
+ * @param {any} children 元素的子元素
+ * @return: Object
+ */
 function createElement(tag, attrs, children){
-
   var props = {}
   var attrs = attrs || {}
 
