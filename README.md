@@ -428,4 +428,6 @@ function flushBatchedUpdates(){
 
 至此，基本功能完成
 
+EventProxy为事件委托处理，具体调用在Dom.js设置元素属性时调用
+
 代码请移步[GitHub仓库](https://github.com/AddOneDn/react-like)
